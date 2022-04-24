@@ -1,0 +1,308 @@
+#+TITLE: Readme
+
+created the project under $GOPATH
+
+
+* Week 3
+** Sort a list with the given arbitrary inputs
+Not working, but in progres 2 5 3 4
+
+#+begin_src go
+import "fmt"
+type P struct {
+    x string
+	y int
+}
+func main() {
+	b := P{"x", -1}
+	a := [...]P{P{"a", 10},
+        P{"b", 2},
+        P{"c", 3}}
+	for _, z := range a {
+		if z.y > b.y {
+			b = z
+		}
+	}
+	fmt.Println(b.x)
+}
+#+end_src
+
+#+RESULTS:
+: a
+
+#+begin_src go
+import "fmt"
+func main() {
+	s := make([]int, 0, 3)
+	s = append(s, 100)
+	fmt.Println(len(s), cap(s))
+}
+
+#+end_src
+
+#+RESULTS:
+: 1 3
+* Week 4
+** Overview
+How to use standards to communicate with other systems.
+** Protocols and Formats
+*** Request For Comments (RFC)
+Data must be standardized, so different programs and systems can share resources.
+**** Examples
+- HTML (Hypertext Markup Language), RFC 1866
+- URI (Uniform Resource Identifier), RFC 3986
+- HTTP (Hypertext Transfer Protocol), RFC 2616
+** Go packages that complies to the standards
+These packages will have:
+- Functions with =encode=.
+- Functions with =decode= (the protocol format).
+*** Package =net/http=
+- Web communication protocol
+- http.Get(www.uci.edu)
+*** Package =net= socket programming
+**** TCP/IP/UDP stack and socket programming
+- net.Dial("tcp", "uci.edu:80")
+** JSON (data format)
+- ACRONYM for: JavaScript Object Notation.
+- RFC 7159.
+- Format to represent structured information.
+- =Attribute-value= pairs.
+  + struct or map
+- Basic value types
+  + Bool
+  + number
+  + string
+  + array
+  + "object"
+*** Example
+**** In Go
+#+begin_src go
+p1 := Person(name: "joe", addr: "a st.", phone: "123")
+#+end_src
+
+**** Equivalent in JSON
+{"name" : "joe", "addr":"a st.", "phone":"123"}
+** JSON (Mod4.1.2)
+*** Properties
+- All Unicode
+- Human-readable
+- Fairly compact representation
+- Types can be combined recursively
+  - Array of structs, struct in struct, etc.
+*** JSON Marshalling (encoding to JSON)
+**** Example
+#+begin_src go :tangle ~/go/src/github.com/BuddhiLW/ProgInGo/Week4/json.go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type Person struct {
+	name  string
+	addr  string
+	phone string
+}
+
+func main() {
+	p1 := Person{name: "joe", addr: "a st.", phone: "123"}
+
+	barr, err := json.Marshal(p1)
+	fmt.Println(err)
+	fmt.Println("byte array (barr):", barr, "\t person 1 (p1) in Go:", p1)
+
+	var p2 Person
+	err2 := json.Unmarshal(barr, &p2)
+	fmt.Println("person 2 (p2) in Go:", p2, "error:", err2)
+}
+#+end_src
+
+#+RESULTS:
+: <nil>
+: byte array (barr): [123 125] 	 person 1 (p1) in Go: {joe a st. 123}
+: person 2 (p2) in Go: {  } error: <nil>
+
+#+begin_src go
+package main
+
+import (
+    "encoding/json"
+    "fmt"
+)
+
+type Person struct {
+    Name  string `json:"name"`
+    Addr  string `json:"addr"`
+    Phone string `json:"phone"`
+}
+
+func main() {
+    p1 := Person{Name: "joe", Addr: "a st.", Phone: "123"}
+
+    barr, err := json.Marshal(p1)
+    if err != nil {
+        panic(err)
+    }
+    fmt.Println(string(barr))
+
+	var p2 Person
+	err2 := json.Unmarshal(barr, &p2)
+	fmt.Println("person 2 (p2) in Go:", p2, "error:", err2)
+}
+#+end_src
+** =os= package
+*** Open, Read, etc.
+#+begin_src go
+package main
+
+import ("fmt"
+	"os")
+
+func main() {
+	f, err := os.Open("dt.txt")
+	fmt.Println(f, err)
+	barr := make([]byte, 10000)
+	nb, err := f.Read(barr)
+	fmt.Println(string(nb[:10]), err)
+	f.Close()
+}
+#+end_src
+
+#+RESULTS:
+
+#+begin_src go
+package main
+
+import (
+    "fmt"
+    "os"
+    "bufio"
+)
+
+
+func main() {
+    file, err := os.Open("dt.txt")
+    if err != nil {
+		fmt.Println(err)
+    }
+    defer file.Close()
+
+    scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+        fmt.Println(scanner.Text())
+    }
+
+    if err := scanner.Err(); err != nil {
+		fmt.Println(err)
+    }
+}
+#+end_src
+** Assignment
+*** Assignment 1
+#+begin_src go :tangle ~/go/src/github.com/BuddhiLW/ProgInGo/Week4/assignment4.go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type Person struct {
+	Name  string `json:"name"`
+	Address  string `json:"address"`
+}
+
+func main() {
+	var x string
+	fmt.Println("Enter 'Name':")
+	_, _ = fmt.Scan(&x)
+
+	var y string
+	fmt.Println("Enter 'Address':")
+	_, _ = fmt.Scan(&y)
+
+	p1 := Person{Name: x, Address: y}
+
+	barr, err := json.Marshal(p1)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(barr))
+}
+#+end_src
+
+#+RESULTS:
+: Enter 'Name':
+: Enter 'Address':
+: {"name":"","address":""}
+A casa azul foi invadida por monges budistas literados em artes furtivas.
+Segundo os conquistadores, ser maraja não é flores.
+Segundo os ultrajados, sua conquista é não ser conquistado.
+Há aqueles os quais orgulham-se de se orgulhar.
+Há aqueles os quais a única coisa a qual os resta é orgulho.
+
+*** Assignment 2
+#+begin_src go :tangle ~/go/src/github.com/BuddhiLW/ProgInGo/Week4/assignment4-read.go
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
+
+type T struct {
+	fname string
+	lname string
+}
+
+func main() {
+	// Ask for file name (fn)
+	fmt.Println("Enter file name, e.g.: 'names.txt'")
+	var fn string
+	_, _ = fmt.Scan(&fn)
+
+	// Open file
+	file, err := os.Open(fn)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer file.Close()
+
+	// Create a slice, in which the T constructs will be populated.
+	var slice []T
+
+	// Counter for each line
+	i := 0
+
+	// Read each line and iterate on it
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+		strline := scanner.Text()
+		// words := strings.Split(strline, " ")
+		// var words [20]string
+		words := strings.Fields(strline)
+		// fmt.Println(words, len(words))
+		fmt.Println("First name:", words[0], "Last name:", words[1])
+		slice = append(slice, T{fname: words[0], lname: words[1]})
+		fmt.Println("Slice so far:", slice)
+		i = i + 1
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println(err)
+	}
+
+	// return slice with T-type elements
+	fmt.Println(slice)
+
+	// Iterate and return first and last names
+	fmt.Println("List of first and last names in the file:")
+
+	for _, value := range slice {
+		fmt.Println("First name:", value.fname, "Last name:", value.lname)
+	}
+#+end_src

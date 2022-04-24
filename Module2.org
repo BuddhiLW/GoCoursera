@@ -1,0 +1,241 @@
+#+TITLE: Module2
+
+* Functions - Week 1
+A set of instructions with a name
+
+** Example
+*** Directly
+#+begin_src go
+package main
+
+import ("fmt")
+
+func main () {
+	fmt.Printf("Hello, world.")
+}
+#+end_src
+
+#+RESULTS:
+: Hello, world.
+
+*** With a helper function
+#+begin_src go
+package main
+
+import ("fmt")
+
+func PrintHello () {
+	fmt.Println("Hello, world!")
+}
+
+func main () {
+	PrintHello()
+}
+#+end_src
+
+#+RESULTS:
+: Hello, world!
+** Re-usability
+If a pattern happens frequently, then to capture it's structure in a function
+can be useful. So that, every time this pattern arises, you can call the
+function to match it.
+** Hidden abstractions
+- Details are hidden in the function.
+- Only need to understand the I/O (operations).
+- Improves understandability.
+
+*** Example
+See the following pseudo-code.
+#+begin_src go
+func FindPupil () {
+	GrabImage ()
+	FilterImage ()
+	FindEllipses ()
+}
+#+end_src
+
+** Parameters and Arguments
+- =x= and =y= are parameters;
+- =2= and =3= are arguments.
+
+parameters: variables in the design of the function.
+arguments: variables-value in the call of the function.
+
+#+begin_src go
+package main
+
+import ("fmt")
+
+func foo(x int, y int){
+	fmt.Println(x*y)
+}
+
+func main(){
+	foo(2,3)
+}
+#+end_src
+
+#+RESULTS:
+: 6
+*** Short hands
+both parameters have the same type =int=.
+#+begin_src go
+func foo(x, y int){
+	fmt.Println(x*y)
+}
+#+end_src
+** Return values
+
+#+begin_src go
+package main
+
+import ("fmt")
+
+func foo(x, y int) int{
+	return x*y
+}
+
+func main(){
+	y := foo(3,4)
+	fmt.Println(y)
+}
+#+end_src
+
+#+RESULTS:
+: 12
+
+#+begin_src go
+package main
+
+import ("fmt")
+
+func foo(x, y int) (int, int){
+	return x*y, 2*x*y
+}
+
+func main(){
+	y, y2 := foo(3,4)
+	fmt.Println(y,y2)
+}
+#+end_src
+
+#+RESULTS:
+: 12 24
+** Call by value
+Other name for how environmental encapsulation happens.
+
+#+begin_src go
+package main
+
+import ("fmt")
+
+func foo(x, y int) (int, int){
+	return x*y, 2*x*y
+}
+
+func main(){
+	x := 3
+	y := 4
+	w, z := foo(x,y)
+	fmt.Println("x:",x,"y:",y,"w:",w,"z:",z)
+}
+#+end_src
+
+#+RESULTS:
+: x: 3 y: 4 w: 12 z: 24
+
+Note the value of =x= and =y= does not go through changes when we call
+=foo(x,y)=, because only the environmental variables - e.i., it's copies - are
+being used to perfom tasks.
+
+** Call by Reference
+To "burlate" environmental encapsulation for performance, we can use pointers.
+
+#+begin_src go
+package main
+
+import ("fmt")
+
+func foo(x *int, y *int){
+	,*x = (*x)*(*y)
+	,*y = 2*(*x)
+}
+
+func main(){
+	x:=3
+	y:=4
+	foo(&x,&y)
+	fmt.Println("x:",x,"y:",y)
+}
+#+end_src
+
+#+RESULTS:
+: x: 12 y: 24
+** Passing Arrays and Slices (Slice vs. Pointers)
+Instead of pointers, you can always deal with Slices. But, be aware that
+** Understandability
+- Code is functions and data
+- If you are asked to =find a feature=, you can find it quickly.
+- Where =data is used=.
+** Function Complexity
+- Function length.
+- Functions should be simple.
+  - Easy to debug.
+- Short functions can be complicated too.
+- Function Call Hierarchy.
+  - Each individual function is less complex.
+*** Control-flow Complexity
+- Control-flow describes conditional paths.
+- Functional hierarchy can reduce control-flow complexity.
+* Assignment Week1
+#+begin_src go :tangle ./Week4/bubblesort.go
+package main
+
+import (
+	"flag"
+	"fmt"
+	"strconv"
+)
+
+func Swap(first, next, count int) (int, int, int) {
+	if first > next {
+		first, next = next, first
+		count = count + 1
+	}
+	return first, next, count
+}
+
+func BubbleSort(sli []int) []int {
+	count_sort := 0
+	for i := 0; i < len(sli)-1; i++ { // sort two-by-two, all 2-tuples
+		sli[i], sli[i+1], count_sort = Swap(sli[i], sli[i+1], count_sort)
+	}
+	if count_sort != 0 {
+		BubbleSort(sli)
+	}
+	return sli
+}
+
+func useFlags() []int {
+	flag.Parse()
+	args := flag.Args()
+	fmt.Println("args:", args)
+
+	nums := make([]int, len(args))
+	// for each argument, insert in position nums[i] the string-converted value num64
+	for i, arg := range args {
+		num64, err := strconv.ParseInt(arg, 0, 0)
+		if err != nil {
+			fmt.Println("You probably didn't enter only integers.")
+		}
+		nums[i] = int(num64)
+	}
+	return nums
+}
+
+func main() {
+	unsorted := useFlags()
+	sorted := BubbleSort(unsorted)
+	fmt.Println(sorted)
+}
+#+end_src
