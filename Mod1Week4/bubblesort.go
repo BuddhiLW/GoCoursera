@@ -6,21 +6,27 @@ import (
 	"strconv"
 )
 
-func Swap(first, next, count int) (int, int, int) {
-	if first > next {
-		first, next = next, first
-		count = count + 1
+func Swap(sli []int, i int) bool {
+	if sli[i] > sli[i+1] {
+		sli[i], sli[i+1] = sli[i+1], sli[i]
+		return true
+	} else {
+		return false
 	}
-	return first, next, count
 }
 
 func BubbleSort(sli []int) []int {
-	count_sort := 0
-	for i := 0; i < len(sli)-1; i++ { // sort two-by-two, all 2-tuples
-		sli[i], sli[i+1], count_sort = Swap(sli[i], sli[i+1], count_sort)
-	}
-	if count_sort != 0 {
-		BubbleSort(sli)
+	count_sort := 1
+	for count_sort > 0 {
+		count_sort = 0
+		for i := 0; i < len(sli)-1; i++ { // sort two-by-two, all 2-tuples
+			if Swap(sli, i) {
+				count_sort++
+			}
+		}
+		if count_sort != 0 {
+			BubbleSort(sli)
+		}
 	}
 	return sli
 }
