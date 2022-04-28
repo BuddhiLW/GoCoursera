@@ -544,3 +544,425 @@ func main (){
 	fmt.Println("The displacement for t=",t,"s(t):", fn(t))
 }
 #+end_src
+** Week 3
+*** Object Orientation
+**** Classes and Encapsulation
+- =Class=: gathering of =Methods= (=functions=) and =data-fields= that operate in the same context.
+- =Object=: an instance of a =Class=, with data - particulars.
+**** Go support for "Classes"
+***** Contrast: Python
+- Has key-word =class=.
+
+#+begin_src python :session localhost :results both
+class Point:
+    def __init__(self,xval,yval):
+        # Assignment, so to start x,y in the class encapsulation
+        self.x = xval
+        self.y = yval
+#+end_src
+***** Go
+The package environment has the same property that the =Class= environment in Python.
+
+- =Data-fields= are called "=receiver-type=".
+- =Methods= receive =receiver-types= in Go.
+- =Methods= only operates on types declared on the package's environment they
+  are in.
+- Data is passed implicitly to =Methods=.
+
+#+begin_src go
+import "fmt"
+
+type MyInt int
+
+func (mi MyInt) MyMethod () int {
+	return int(mi + 1)
+}
+
+func main (){
+	var x MyInt
+	x = 10
+	fmt.Println(x.MyMethod())
+}
+#+end_src
+
+#+RESULTS:
+: 11
+
+**** Struts in the context of Classes
+
+For a =Method= to receive *many* =Args=, it must be bundled in a =Struct=.
+Because, a =Method= call would follow the structure: =Obj.Method()=. Therefore,
+it's necessary that =Methods= only receive a unique =Object=.
+
+E.g., the methods that use a variety of arguments must be implemented receive
+the tuple of these arguments.
+
+***** Example
+
+#+begin_src go
+import (
+	"fmt"
+	"math"
+)
+
+type Point struct {
+	x float64
+	y float64
+}
+
+func (p Point) DistToOrig() float64 {
+	t := math.Pow(p.x,2) + math.Pow(p.y,2)
+	return math.Sqrt(t)
+}
+
+func main () {
+	p := Point{x: 1.3, y: (-1 * math.Pi)}
+	fmt.Println(p.DistToOrig())
+}
+#+end_src
+
+#+RESULTS:
+: 3.399941823191885
+**** Encapsulation - Controlling Access
+***** Public vs Private access to methods
+- =Public= methods begin with a capital letter.
+- =Private= methods begin with a low letter.
+**** Methods with Call-by-value and Call-by-reference
+
+***** Call by value
+#+begin_src go
+import "fmt"
+
+type MyInt int
+
+func (mi MyInt) MyMethod () int {
+	return int(mi + 1)
+}
+
+func main (){
+	var x MyInt
+	x = 10
+	fmt.Println(x.MyMethod())
+}
+#+end_src
+
+***** Call by reference
+#+begin_src go
+import "fmt"
+
+type MyIntBR struct {
+	x float64
+	y float64
+}
+
+type MyIntBV struct {
+	x float64
+	y float64
+}
+
+func (mi *MyIntBR) MyMethodBR (xx,yy float64) {
+	mi.x = mi.x + xx + 1
+	mi.y = mi.y + yy + 2
+}
+
+func (mi MyIntBV) MyMethodBV (xx,yy float64) (float64,float64){
+	return (mi.x + xx + 1), (mi.y + yy + 2)
+}
+
+func main (){
+	fmt.Println("With Call By Reference:")
+
+	var z MyIntBR
+	z = MyIntBR{x: 10, y: 22}
+	fmt.Println(z.x, z.y)
+	z.MyMethodBR(10,22)
+	fmt.Println(z.x, z.y)
+
+	fmt.Println("With Call By Value:")
+	var w MyIntBV
+	w = MyIntBV{x: 10, y: 22}
+	w.MyMethodBV(99, 299)
+	fmt.Println(w.x, w.y)
+	wx, wy := w.MyMethodBV(10,22)
+	fmt.Println(wx, wy)
+}
+#+end_src
+
+#+RESULTS:
+: With Call By Reference:
+: 10 22
+: 21 46
+: With Call By Value:
+: 10 22
+: 21 46
+*** Assignment 5
+
+#+begin_src go :tangle ~/go/src/github.com/BuddhiLW/ProgInGo/Mod2Week3/animals-try1.go
+package main
+
+import (
+	"fmt"
+	"reflect"
+)
+
+type Animal struct {
+	// cow := Animal{Food: "grass", Locomotion: "walk", Noise: "moo"}
+	Food       string
+	Locomotion string
+	Noise      string
+}
+
+type Animals struct {
+	Animals []Animal
+}
+
+func (a Animal) Eat() {
+	fmt.Println("Food eaten", a.Food)
+}
+
+func (a Animal) Walk() {
+	fmt.Println("Locomotion method:", a.Locomotion)
+}
+
+func (a Animal) Speak() {
+	fmt.Println("Spoken sound:", a.Noise)
+}
+
+// func (as Animals) anyAnimal() string {
+
+// }
+
+func main() {
+	cow := Animal{Food: "grass", Locomotion: "walk", Noise: "moo"}
+	bird := Animal{Food: "worms", Locomotion: "fly", Noise: "peep"}
+	snake := Animal{Food: "mice", Locomotion: "slither", Noise: "hsss"}
+	animals := Animals{Animals: []Animal{cow, bird, snake}}
+
+	// var animals []Animal
+	// animals = make([]Animal, 3)
+	// animals[0] = cow
+	// animals[1] = bird
+
+	// var animals Animals
+	// animals = make(animals2, 0, 3)
+
+	// var input string
+	// if input != "X" {
+	// 	fmt.Println(">")
+	// 	fmt.Scan(&input)
+	// }
+	v := reflect.ValueOf(cow)
+	// V := reflect.ValueOf(animals)
+	typeOfv := v.Type()
+	// typeOfV := reflect.ValueOf(animals)
+
+	for i := 0; i < v.NumField(); i++ {
+		fmt.Printf("Field: %s\tValue: %v\n", typeOfv.Field(i).Name, v.Field(i).Interface())
+	}
+	fmt.Println(animals)
+
+	// for i := 0; i < 3; i++ {
+	// 	fmt.Printf("Field: %s\tValue: %v\n", typeOfV.Field(i).Name, V.Field(i).Interface())
+	// }
+}
+#+end_src
+
+#+begin_src go :tangle ~/go/src/github.com/BuddhiLW/ProgInGo/Mod2Week3/animals-try2.go
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+type Animal struct {
+	Food       string
+	Locomotion string
+	Noise      string
+}
+
+type Animals struct {
+	Animals []Animal
+}
+
+func (a Animal) Eat() {
+	fmt.Println("Food eaten", a.Food)
+}
+
+func (a Animal) Walk() {
+	fmt.Println("Locomotion method:", a.Locomotion)
+}
+
+func (a Animal) Speak() {
+	fmt.Println("Spoken sound:", a.Noise)
+}
+
+type DoubleStrLists struct {
+	list1 []string
+	list2 []string
+}
+
+func (lists DoubleStrLists) PossibleStrings(input string) {
+	for _, string1 := range lists.list1 {
+		for _, string2 := range lists.list2 {
+			var concatStr = []string{string1, string2}
+			if strings.Join(concatStr, " ") == input {
+				fmt.Println(concatStr[0], concatStr[1])
+			} else {
+				fmt.Println("Either the animal-behavior input is incorrect,\n or the animal-behavior is not listed")
+			}
+		}
+	}
+}
+
+func main() {
+	// cow := Animal{Food: "grass", Locomotion: "walk", Noise: "moo"}
+	// bird := Animal{Food: "worms", Locomotion: "fly", Noise: "peep"}
+	// snake := Animal{Food: "mice", Locomotion: "slither", Noise: "hsss"}
+
+	fmt.Println("Use key-words in lower-case. E.g., cow eat, bird move, snake speak")
+
+	var input string
+	if input != "X" {
+		fmt.Println(">")
+		fmt.Scan(&input)
+
+		var strings DoubleStrLists
+		strings = DoubleStrLists{list1: []string{"cow", "bird", "snake"}, list2: []string{"eat", "move", "speak"}}
+
+		strings.PossibleStrings(input)
+		// if strings.PossibleStrings(input) {
+
+		// }
+	}
+
+	// for i := 0; i < v.NumField(); i++ {
+	// 	fmt.Printf("Field: %s\tValue: %v\n", typeOfv.Field(i).Name, v.Field(i).Interface())
+	// }
+
+	// fmt.Println(animals)
+}
+#+end_src
+
+#+begin_src go :tangle ~/go/src/github.com/BuddhiLW/ProgInGo/Mod2Week3/animals.go
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
+
+type Animal struct {
+	Food       string
+	Locomotion string
+	Noise      string
+}
+
+type Animals struct {
+	Animals []Animal
+}
+
+func (a Animal) Eat() {
+	fmt.Println("Food eaten:", a.Food)
+}
+
+func (a Animal) Walk() {
+	fmt.Println("Locomotion method:", a.Locomotion)
+}
+
+func (a Animal) Speak() {
+	fmt.Println("Spoken sound:", a.Noise)
+}
+
+type DoubleStrLists struct {
+	list1 []string
+	list2 []string
+}
+
+func (lists DoubleStrLists) PossibleStrings(input string) (string, string) {
+	var animal string
+	var behavior string
+
+	for _, string1 := range lists.list1 {
+		for _, string2 := range lists.list2 {
+			var concatStr = []string{string1, string2}
+			if strings.Join(concatStr, " ") == input {
+				fmt.Println("It's in the possible list, in which", "animal:", concatStr[0], "behavior:", concatStr[1])
+				animal, behavior = concatStr[0], concatStr[1]
+			}
+		}
+	}
+	return animal, behavior
+}
+
+// func (lists DoubleStrLists) PossibleStringsPrint() {
+// 	for _, string1 := range lists.list1 {
+// 		for _, string2 := range lists.list2 {
+// 			var concatStr = []string{string1, string2}
+// 			fmt.Println(strings.Join(concatStr, " "))
+// 		}
+// 	}
+// }
+
+func main() {
+	cow := Animal{Food: "grass", Locomotion: "walk", Noise: "moo"}
+	bird := Animal{Food: "worms", Locomotion: "fly", Noise: "peep"}
+	snake := Animal{Food: "mice", Locomotion: "slither", Noise: "hsss"}
+
+	fmt.Println("Use key-words in lower-case. \nE.g., cow eat, bird move, snake speak\n If you want to exit, press 'X' and Enter")
+
+	for {
+		var input string
+		fmt.Println(">")
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan() // use `for scanner.Scan()` to keep reading
+		input = scanner.Text()
+		fmt.Println("captured:", input)
+		if input == "X" {
+			break
+		} else {
+			var strings DoubleStrLists
+			strings = DoubleStrLists{list1: []string{"cow", "bird", "snake"}, list2: []string{"eat", "move", "speak"}}
+
+			animal, behavior := strings.PossibleStrings(input)
+
+			switch animal {
+			case "cow":
+				switch behavior {
+				// Eat Walk Speak
+				case "eat":
+					cow.Eat()
+				case "move":
+					cow.Walk()
+				case "speak":
+					cow.Speak()
+				}
+
+			case "bird":
+				switch behavior {
+				// Eat Walk Speak
+				case "eat":
+					bird.Eat()
+				case "move":
+					bird.Walk()
+				case "speak":
+					bird.Speak()
+				}
+			case "snake":
+				switch behavior {
+				// Eat Walk Speak
+				case "eat":
+					snake.Eat()
+				case "move":
+					snake.Walk()
+				case "speak":
+					snake.Speak()
+				}
+			}
+		}
+	}
+}
+#+end_src
+** Week 4
