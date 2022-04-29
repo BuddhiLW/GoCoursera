@@ -1,0 +1,102 @@
+#+title: Assignment 1, Moore Law
+
+#+begin_quote
+*Define Moore’s law* and explain why it has now stopped being true. Be sure to describe all of the physical limitations that have prevented Moore’s law from continuing to be true.
+#+end_quote
+
+The reasons Moore's Law hit a wall, in summary, are:
+- Joule heating, or Ohmic heating, directly proportional to power.
+- Limited diminished voltage gap for conduction and noise problems.
+- Limited capability to cool the processors with =air-fans= - a standard in
+  industry.
+- Limited transistor scaling due to =source-to-drain leakage=.
+
+
+* Heating and Source to Drain Leakage
+
+** Joule heating
+#+begin_quote
+Joule heating, or Ohmic heating, directly proportional to power.
+#+end_quote
+
+The Joule's dissipation effect, or sometimes referred as Ohmic heating, states that $$P_{\text{dissipated power}} = I^2R \tag{1}$$.
+
+Generally, R is directly proportional to the length of the resistor and
+inversely proportional to the area. The equation which represents it is:
+
+\(\begin{array}{l}R= \frac{\rho L}{A}\end{array} \)
+
+Today, these dimensions are close to their least value, and the conduction
+happens on a quantum level (quantized).
+
+#+begin_quote
+The transistor gate, the part of the transistor through which electrons flow as electric current, is now approaching a width of just 2 nanometers, according to the Taiwan Semiconductor Manufacturing Company’s production roadmap for 2024.
+
+A silicon atom is 0.2 nanometers wide, which puts the gate length of 2 nanometers at roughly 10 silicon atoms across. At these scales, controlling the flow of electrons becomes increasingly more difficult as all kinds of quantum effects play themselves out within the transistor itself.
+#+end_quote
+- [[https://interestingengineering.com/transistors-moores-law][Transistors, Moore's Law]]
+
+Therefore, this makes impossible to control the geometry of the transistor, in order to
+diminish heat.
+
+** Source-to-Drain leakage
+There are a variety of causes of =source-to-drain= leakage. But, one that is
+common to all nanotechnology is the =Narrow-with-effect=.
+
+#+begin_quote
+  An anomalous threshold voltage behavior of certain sub-halfmicron
+  semiconductors due to migration of specific elements and local oxidation.
+#+end_quote
+
+The /migration of specific elements/ are due to the fact that at quantum level
+atoms and electrons are shared through space with certain probabilities. That
+is, they can "jump" from where they were instantaneously. And, these effects
+affect the efficiency of semiconductors - e.i., transistors - of nano-scale.
+Thus, suddenly, diminishing the size of transistors results in an unprecedented
+eletrical resistance, therefore heating and power consumption.
+
+* Voltage Gap
+#+begin_quote
+Limited diminished voltage gap for conduction and noise problems.
+#+end_quote
+
+The electron in each material can occupy either a valence band or a conduction
+band. Exciting - e.i., giving energy to the material - can make electrons go
+from valence band to conduction band states, which makes conduction possible.
+
+The necessary energy-gap between states translates in a corresponding
+voltage-excitation that is needed to make semiconductors act from a insulator
+to conductor behavior.
+
+Transistor must have a gap so they can make this switch. Varying this gaps maps
+to different materials and properties.
+
+The conclusion is, we have reached a current limit on the materials that are
+conduction-wise stable and have low band-gap.
+
+Diminishing even further the band-gap can lead to increasing the need of control
+of electromagnetic control of fields to an unfeasible practical (commercial)
+reach.
+
+* Cooling
+#+begin_quote
+Limited capability to cool the processors with =air-fans= - a standard in industry.
+#+end_quote
+
+Given the fact that we are using /air-fans/ to cool the Ohmic dissipation, the
+geometry of the cooling device is constrained by the size of the device we are
+cooling and where it will be stored in an eletronic unit.
+
+It's always possible to calculate, even with simple physic's principles, an
+estimate of what is the maximum cooling alleviation that a fan of a given size
+can deliver.
+
+#+begin_quote
+ (...) The point is that the commercial availability of a
+ fan is often a determinant of the air cooling limit. The limit here is set
+ by the physics of enthalpy transport and the economy of procuring fans.
+#+end_quote
+- [[https://www.electronics-cooling.com/2006/08/exploring-the-limits-of-air-cooling/][Exploring the limits of air cooling]]
+
+Finally, we conclude that there is a limit of how much we can increase power of
+a core of a CPU, with this additional constrain of limited heat-alleviation.

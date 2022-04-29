@@ -1186,3 +1186,49 @@ func main() {
 }
 #+end_src
 * Modulus 3
+** Week 1
+*** Parallel Execution (=Parallelism=)
+Two programs executing at the same time.
+
+Given processors P1 and P2, at a given time, both are performing on the same instruction.
+
+Need replicated hardware.
+
+*** Von Neumman Bottleneck
+#+begin_quote
+Memory access time is a performance bottleneck.
+#+end_quote
+
+- Use of internal memory takes 100 cycles to happen.
+- Use of cache memory takes 1 cycle.
+- Physically restrict.
+
+*** Dennard Scaling
+*** Leakage Power
+*** Multi-core Systems
+- Parallel execution is needed to exploit multi-core systems.
+- Code made to execute on multiple cores.
+- Different programs executing on different cores.
+*** Concurrent vs Parallel
+Programmers determine which tasks can be executed in parallel.
+
+Mapping tasks to hardware usually are determined by:
+- Operational System.
+- Go runtime scheduler.
+
+**** Concurrent
+- Sequential execution.
+- Can be run in one hardware.
+
+**** Parallel
+- Must be run in multiple hardware.
+- Sequential and simultaneous run.
+
+**** Hiding Latency
+- Concurrency improves performance, even without parallelism.
+- Tasks must *periodically wait* for something.
+  - E.g., access memory.
+- Other concurrent tasks can operate while one task is waiting.
+
+**** TODO Hardware Mapping
+** Week 2
