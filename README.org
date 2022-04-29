@@ -965,4 +965,224 @@ func main() {
 	}
 }
 #+end_src
+
 ** Week 4
+*** Polymorphism
+**** Definition
+The ability to make =methods= behave in context. For different =Object-types=
+methods can use different algorithms to compute the same phenomena associated
+with the object. E.g., different ways to measure area, depending on the
+geometric object.
+
+**** Inheritance (not supported on Go)
+Abstractions go from particulars to generalizations, for example
+
+#+begin_example
+dog -> mammal -> animal -> living being.
+#+end_example
+
+#+begin_example
+cannabis sativa -> rosales -> angiosperms -> plant -> living being.
+#+end_example
+
+As we can see, very different =objects= can have the same underlying high-order
+abstraction - e.i., 'dog' and 'cannabis sativa' being 'living beings'.
+
+=Polymorphism= would be a description, through =methods=, that is shared to all
+these objects, on a high-order-abstraction context. e.g., "energy-consumption",
+"reproduction", "nervous-terminals", "evolution", "natural selection" etc.
+**** Overriding (an alternative to Inheritance)
+- Subclass (lower-level-abstraction) redefining a method inherited from
+  (higher-level-abstraction) superclass. See [[*Inheritance (not supported on Go)][Inheritance (not supported on Go)]].
+**** Interfaces (an alternative to Inheritance)
+#+begin_quote
+If it looks like a duck, walks like a duck, swims like a duck and quacks like a
+duck, it’s a duck.
+#+end_quote
+
+#+begin_quote
+A =type= satisfies an interface if it defines all =methods= specified in the
+=interface=.
+
+- Ian Harris, University of California, Irvine; Functions, Methods, and Interfaces in Go
+#+end_quote
+
+
+Interfaces contains a set of =method signatures=, e.i., name, parameters, return
+values.
+
+***** Example
+#+begin_src go
+type Shape2D interface{
+	Area() float64
+	Perimeter() float64
+}
+
+type Triangle {...}
+
+func (t Triangle) Area() float64 {...}
+func (t Triangle) Perimeter() float64 {...}
+#+end_src
+*** Assignment 6
+**** Try 1
+#+begin_src go :tangle ~/go/src/github.com/BuddhiLW/ProgInGo/Mod2Week4/animals.go
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
+
+type Animal interface {
+	Eat ()
+	Walk ()
+	Noise ()
+}
+
+type Cow struct {
+	Food string
+	Locomotion string
+	Noise string
+}
+
+type Bird struct {
+	Food string
+	Locomotion string
+	Noise string
+}
+
+type Snake struct {
+	Food string
+	Locomotion string
+	Noise string
+}    
+
+func (a Cow) Eat() {
+	fmt.Println("Food eaten:", a.Food)
+}
+
+func (a Cow) Walk() {
+	fmt.Println("Locomotion method:", a.Locomotion)
+}
+
+func (a Cow) Speak() {
+	fmt.Println("Spoken sound:", a.Noise)
+}
+
+
+func (a Bird) Eat() {
+	fmt.Println("Food eaten:", a.Food)
+}
+
+func (a Bird) Walk() {
+	fmt.Println("Locomotion method:", a.Locomotion)
+}
+
+func (a Bird) Speak() {
+	fmt.Println("Spoken sound:", a.Noise)
+}
+
+
+func (a Snake) Eat() {
+	fmt.Println("Food eaten:", a.Food)
+}
+
+func (a Snake) Walk() {
+	fmt.Println("Locomotion method:", a.Locomotion)
+}
+
+func (a Snake) Speak() {
+	fmt.Println("Spoken sound:", a.Noise)
+}
+
+type DoubleStrLists struct {
+	list1 []string
+	list2 []string
+}
+
+func (lists DoubleStrLists) PossibleStrings(input string) (string, string) {
+	var animal string
+	var behavior string
+
+	for _, string1 := range lists.list1 {
+		for _, string2 := range lists.list2 {
+			var concatStr = []string{string1, string2}
+			if strings.Join(concatStr, " ") == input {
+				fmt.Println("It's in the possible list, in which", "animal:", concatStr[0], "behavior:", concatStr[1])
+				animal, behavior = concatStr[0], concatStr[1]
+			}
+		}
+	}
+	return animal, behavior
+}
+
+func main() {
+	cow := Cow{Food: "grass", Locomotion: "walk", Noise: "moo"}
+	bird := Bird{Food: "worms", Locomotion: "fly", Noise: "peep"}
+	snake := Snake{Food: "mice", Locomotion: "slither", Noise: "hsss"}
+
+	fmt.Println("Use key-words in lower-case. \nE.g., cow eat, bird move, snake speak\n If you want to exit, press 'X' and Enter")
+
+	for {
+		var input string
+		fmt.Println(">")
+		scanner := bufio.NewScanner(os.Stdin)
+		scanner.Scan() // use `for scanner.Scan()` to keep reading
+		input = scanner.Text()
+		fmt.Println("captured:", input)
+		if input == "X" {
+			break
+		} else {
+			var s Animal
+			
+			var strings DoubleStrLists
+			strings = DoubleStrLists{list1: []string{"cow", "bird", "snake"}, list2: []string{"eat", "move", "speak"}}
+
+			animal, behavior := strings.PossibleStrings(input)
+
+			switch animal {
+			case "cow":
+				switch behavior {
+				case "eat":
+					s = cow
+					s.Eat()
+				case "move":
+					s = cow
+					s.Walk()
+				case "speak":
+					s = cow
+					s.Speak()
+				}
+
+			case "bird":
+				switch behavior {
+				case "eat":
+					s = bird
+					s.Eat()
+				case "move":
+					s = bird
+					s.Walk()
+				case "speak":
+					s = bird
+					s.Speak()
+				}
+			case "snake":
+				switch behavior {
+				case "eat":
+					s = snake
+					s.Eat()
+				case "move":
+					s = snake
+					s.Walk()
+				case "speak":
+					s = snake
+					s.Speak()
+				}
+			}
+		}
+	}
+}
+#+end_src
+* Modulus 3
