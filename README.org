@@ -27,9 +27,6 @@ func main() {
 }
 #+end_src
 
-#+RESULTS:
-: a
-
 #+begin_src go
 import "fmt"
 func main() {
@@ -1231,4 +1228,81 @@ Mapping tasks to hardware usually are determined by:
 - Other concurrent tasks can operate while one task is waiting.
 
 **** TODO Hardware Mapping
-** Week 2
+** Week 3
+*** Parallel execution in =Go=
+**** Example 1
+What we want is to parallelize two executions of print, in this example
+#+begin_src go :tangle ./Mod3Week3/example1.go :output both
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	go fmt.Printf("New routine")
+	fmt.Printf("Main routine")
+}
+#+end_src
+
+#+RESULTS:
+: Main routine
+
+We see that we weren't able to make =fmt.Printf("New routine")= run parallel to =fmt.Printf("Main routine")=. Because, the =main= routine finished before the parallel thread is executed.
+**** Example 2
+We can schedule tasks, so we make sure to run everything we want, before the main routine ends.
+
+#+begin_src go :tangle ./Mod3Week3/example2.go :output both
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func foo(wg *sync.WaitGroup) {
+	fmt.Printf("New routine\n") // -> used to be in the main function directly
+	wg.Done()
+}
+
+func main() {
+	// New lines ------
+	var wg sync.WaitGroup
+	wg.Add(1)
+	// ------ **
+	go foo(&wg) // -> old: go fmt.Printf("New routine")
+	// ------ **
+	wg.Wait()
+	// ------------------
+	fmt.Printf("Main routine")
+}
+#+end_src
+
+#+RESULTS:
+: New routine
+: Main routine
+** Week 4 - Mutex
+*** Using =Sync.Mutex=
+#+begin_src go
+package main
+
+var i int = 0
+var mut sync.Mutex
+func inc(i int) {
+	mut.Lock()
+	i = i + 1
+	mut.Unlock()
+}
+
+func main () {
+	sum := 0
+	for i := 0; i < 10; i++ {
+		inc(sum)
+	}
+}
+#+end_src
+
+#+RESULTS:
+
+#+ATTR_HTML: :width 500px
+[[file:~/Screenshots/maim-region-20220820-182246.png][file:~/Screenshots/maim-region-20220820-182246.png]]
